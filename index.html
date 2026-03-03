@@ -1,0 +1,272 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Galactica Launcher</title>
+  <style>
+    /* Reset & base */
+    * { box-sizing: border-box; }
+    html, body {
+      height: 100%; margin: 0; background: #121212; color: #eee;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      overflow: hidden; user-select: none; position: relative;
+    }
+    body { display: flex; height: 100vh; position: relative; }
+
+    /* Top/Bottom UI */
+    #topTitle {
+      position: fixed; top: 0; left: 50%; transform: translateX(-50%);
+      font-size: 1.8rem; font-weight: 700; color: #5c6ac4; padding: 12px 0;
+      z-index: 250; text-shadow: 1px 1px 3px #222; pointer-events: none;
+    }
+    #bottomFooter {
+      position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+      font-size: 1rem; color: #888; padding: 10px 0; z-index: 250;
+      font-style: italic; pointer-events: none;
+    }
+    
+    /* Sidebar Toggles */
+    #toggleLeft, #toggleRightUtilities {
+      position: fixed; top: 15px; width: 150px; height: 40px;
+      background: #5c6ac4; border: none; border-radius: 20px;
+      color: white; cursor: pointer; font-weight: 600; z-index: 200;
+      display: flex; align-items: center; justify-content: center; gap: 8px;
+      transition: background-color 0.3s ease;
+    }
+    #toggleLeft { left: 15px; }
+    #toggleRightUtilities { right: 15px; }
+    #toggleLeft:hover, #toggleRightUtilities:hover { background-color: #7e8bf7; }
+
+    /* Sidebars */
+    #menuLeft, #menuRightUtilities {
+      position: fixed; top: 0; height: 100vh; background: #1e1e1e;
+      padding: 20px; box-shadow: 0 0 15px rgba(0,0,0,0.5);
+      display: flex; flex-direction: column; z-index: 150;
+      transition: transform 0.3s ease; overflow-y: auto;
+    }
+    #menuLeft { width: 260px; left: 0; transform: translateX(-260px); }
+    #menuRightUtilities { width: 320px; right: 0; transform: translateX(320px); }
+    #menuLeft:not(.hidden), #menuRightUtilities:not(.hidden) { transform: translateX(0); }
+
+    .sidebar-header { font-size: 1.25rem; font-weight: 700; text-align: center; margin-bottom: 15px; border-bottom: 1px solid #333; padding-bottom: 10px; }
+    .category-title { font-size: 1rem; color: #5c6ac4; margin: 15px 0 8px 0; font-weight: bold; text-transform: uppercase; letter-spacing: 1px; }
+
+    /* GIF Options */
+    .gifOption {
+      cursor: pointer; display: flex; flex-direction: column; align-items: center;
+      gap: 8px; color: #bbb; padding: 10px; border-radius: 8px; transition: 0.2s;
+    }
+    .gifOption img { width: 100%; border-radius: 6px; filter: grayscale(30%); }
+    .gifOption:hover { background: #2a2a82; color: #fff; }
+    .gifOption.selected { border: 2px solid #5c6ac4; color: #5c6ac4; }
+    .gifOption.selected img { filter: none; }
+
+    /* Game Buttons */
+    .gameBtn {
+      width: 100%; margin-bottom: 8px; background: #333; border: 1px solid #444;
+      color: white; padding: 12px; border-radius: 6px; cursor: pointer;
+      text-align: left; transition: 0.2s;
+    }
+    .gameBtn:hover { background: #5c6ac4; border-color: #7e8bf7; transform: translateX(5px); }
+
+    /* Main viewer */
+    #viewer {
+      flex: 1; display: flex; justify-content: center; align-items: center;
+      background: #000; height: 100vh; transition: margin 0.3s ease;
+    }
+    #mainGif { max-width: 90vw; max-height: 85vh; border-radius: 14px; box-shadow: 0 20px 40px rgba(92, 106, 196, 0.4); }
+  </style>
+</head>
+<body>
+
+  <div id="topTitle">Galactica</div>
+  <div id="bottomFooter">Made by Galactic</div>
+
+  <button id="toggleLeft">▶ <span>GIF Gallery</span></button>
+  <button id="toggleRightUtilities"><span>Games</span> ◀</button>
+
+    <!-- Left Sidebar (GIF menu) -->
+  <aside id="menuLeft" class="hidden" aria-label="GIF selection menu">
+    <div class="sidebar-header">GIF Gallery</div>
+    <div class="gifOption selected" tabindex="0" data-name="spring" data-src="https://www.thisiscolossal.com/wp-content/uploads/2018/08/Isopoly_05.gif">
+      <img src="https://www.thisiscolossal.com/wp-content/uploads/2018/08/Isopoly_05.gif" alt="spring" />
+      <span>spring</span>
+    </div>
+    <div class="gifOption" tabindex="0" data-name="explosion" data-src="https://www.thisiscolossal.com/wp-content/uploads/2018/08/Isopoly_01.gif">
+      <img src="https://www.thisiscolossal.com/wp-content/uploads/2018/08/Isopoly_01.gif" alt="explosion" />
+      <span>explosion</span>
+    </div>
+    <div class="gifOption" tabindex="0" data-name="dots" data-src="https://www.thisiscolossal.com/wp-content/uploads/2018/08/Isopoly_02.gif">
+      <img src="https://www.thisiscolossal.com/wp-content/uploads/2018/08/Isopoly_02.gif" alt="dots" />
+      <span>dots</span>
+    </div>
+    <div class="gifOption" tabindex="0" data-name="slime" data-src="https://www.thisiscolossal.com/wp-content/uploads/2018/08/Isopoly_03.gif">
+      <img src="https://www.thisiscolossal.com/wp-content/uploads/2018/08/Isopoly_03.gif" alt="slime" />
+      <span>slime</span>
+    </div>
+    <div class="gifOption" tabindex="0" data-name="sparkles" data-src="https://www.thisiscolossal.com/wp-content/uploads/2018/08/Isopoly_04.gif">
+      <img src="https://www.thisiscolossal.com/wp-content/uploads/2018/08/Isopoly_04.gif" alt="sparkles" />
+      <span>sparkles</span>
+    </div>
+    <div class="gifOption" tabindex="0" data-name="glitch" data-src="https://trancentral.tv/wp-content/uploads/2016/06/psychedelic-sunset.gif">
+      <img src="https://trancentral.tv/wp-content/uploads/2016/06/psychedelic-sunset.gif" alt="glitch" />
+      <span>glitch</span>
+    </div>
+    <div class="gifOption" tabindex="0" data-name="Hard-soft" data-src="https://techtips.colonielibrary.org/wp-content/uploads/2024/07/gifhardsoft.gif">
+      <img src="https://techtips.colonielibrary.org/wp-content/uploads/2024/07/gifhardsoft.gif" alt="Hard-soft" />
+      <span>Hard-soft</span>
+    </div>
+    <h1>Weird Gifs</h1>
+    <div class="gifOption selected" tabindex="0" data-name="Suprised Hancock" data-src="https://techcrunch.com/wp-content/uploads/2014/06/surprised-andy.gif">
+      <img src="https://techcrunch.com/wp-content/uploads/2014/06/surprised-andy.gif" alt="Suprised Hancock" />
+      <span>Suprised Hancock</span>
+    </div>
+    <div class="gifOption selected" tabindex="0" data-name="Evil Patrick" data-src="https://learn.g2.com/hs-fs/hubfs/plan%20gif%20marketing%20strategy.gif?width=500&name=plan%20gif%20marketing%20strategy.gifbxp2wyDiszsgRWqdMf9sHQev2t2chMspX9D2vD+GwwkVNq8317enmXASJ0DPi6h0Qb29y8TBvoWU4r4n0L6aACw4Rog3d3IYv0G/afhEx0/iXqSp7h3D4RrYT3KafWcngmg79Mx+A8Ybk34Y27ixwsub1SD4b/deJ6BS3t3NMkVigAjEBVQrXuCLEbx8xzERKUbalojIjwEMYDIYWp0dXd1aht3PwPZfd3gQi7P1OfxXCe80My+KG3muq+W/wBQyF/Tpv8Ab7Zfa547XoSAA0y9n37IZR+ovZDKLcQA+xCwWEE7PdAYzJ2QQxa/Z/tHqRseR4ur+Ue36TlpH1NGR0BFjJJ2CUVJWZuoYjNZW9MDQ+uOY7eyQlG3iWxlhJ05ZJfI3UFlUpF7kEcNgywvcKo0zMbC/Ic5nnO2hlq1lHTd9kW4jAFVzhldeJU7u+QU03Yop4hSllaafmD9mUek2hRW3oU6j79x9H4fGdrhjjG8mrmHi1XJSuzvTsxSORtvvO1HE1bp9Dy0cVWb127D4HCF0DE7+fYbSOIsqjSKsVCKqPKYNqWJWmrAgjM5U6ZT6Iv+r4CYas+h2uB4C0niJrbSPr3+QwFhKD0gzICLGAJ2KDgkvcXB7GYfOLKizmytYcYb9b/1QsLP5L6FWIwtxbM5HG7aWsTE0TjUs9kX0PQW/qi/hH0K5fE7FezR+Gp4tdj/ADEn5xx2JVvjaL6qZgRzBHjBkE7O5Tha4yC5AIFjcjeND7xBPQnOLzaEjik9dfEQuiPLl2InGJwN+4E/ARZkS5UuxVUcsVZEa433soK8jfWJ3JJJJqTNdO/G1+yNFTt0JRiFGBViaWZSOPDsO8HxkZEoOz1DuzMT0tJH4ka/uGje8GXwlmR4viGG5GJlT6br0NOQH75ayRj2HCiAaCyiAIYr9mAyVhAW43Rw0FY8PVZzD6RisbQwqTqu19lu36Jaksphc5q9ocJe1TND/wBotIn0HSILaMp6p5HeI1LK9djpzcK0M0HddGgls+v0i3OjA2deTfQyipHK/IjCbas90HsZT/BoEejlI/mvr7fpMafidzNSa5009/7E9knSt6vRm/K/D2yM+hHFWWW29zJ5Ni2PDb74ar/xemZ2MBJJNPuvuYuM081NLzOtw+Gpsodm3gl2zAa39G2/n4T0FWvVhU5cIaLyOFNzjeMI+n8hCllfq06ig9XKLXsAddLgm407N/fkqQqx8U0zC8O07zT63OdoNmL1Cb52JB5qOqnuA8Zivd3Pb0KSo0YU10X76l0CwUQCjAUQFeIzZTlAJ7d0LEo2vqPUHVPcfhExL4iGC/y0/avwEI7DqfG/UtPKMiVLhUH5R7Rc+JhZE3Uk+pYKSj8o8BGRzNkrQEK0QCgAoxCgMUQGrybpk9Ko/LUv3Bhf43kqbtdHB4/HxU5rqrP5BzzVpbc88osdcMdeHzhcdiXmx+xC5Kw64fcd1+HEX4aGFwyi83HE/wDf/cVxrQfzfv8AfI3Cx4Q50EwdT2WDpqpxCvVqayi1GPlG19PUhcwOxVpQqwcKiun0YS2GFap+K2VADmI5AX8eEqqtxXhPLqM+GYtUKWsKmy7P+A3W8oFQXTDIaX5lHpFfW3an7vM6w7m/FLX7HTqYWpbPm8QXoUlZGya0KidLTbgpAvbmP7SiV07PdGV1rtTfxLR+aKEwrmgvRi+diXtv09EHshfxO5pdaCrNz0stCGGw1OhXSo+Iy1VRhkQBjZyuhBBv6I4TbhKlXXlxuc7iOJVRJbINLVoBemKFkGjWuCpPFk007rd061PieKjLlVdL7dznVZyy6BJaGHrJmoMLjUFTu/cDum6GKqxdqmqKKVeWbXVHP7PPUy8VJU+w/S058ouMnE9i5ZkpLqkaYhCgAoAKACgAxiuBm2dUGXLe+Tq+wbj4SMXoW1YvNfuXCkM2fja3skiGZ2sWRkRQAUAFEAo0AoCFAYjEAV8kaRPTVLdVnAB55FsSPabeySh1ZxOOSTdOHVJt/M6IJ8JYjgqIxQ2jDKR6G19N+p7dABf2Ru4so7JY79/3pFYMoxpHT71+fGJoMo+U84rBY8hwmJwlYimaOQnRTp8RrecCcK9NZs1z2ld+6zVVvWTs3+1wJtDBGlVanvtqDzB3H75TXSqKcFI11+I0aFHm1Xby6t9kaF2exw/SAgr0mQ21INr3PIej4xZvHr2OJhVWxXEFiMRHKorwR669X5lgqhbDfblIvU04/jdDDz5UU5z7Iv2djnpq1K5WkxOVTuW+9QTqATw7ZColO0upzMLxOMqyWJpOF9m9ghSxTqCFcgHeAZRlPRujCbvJGLYj5q2JcauoCrx3A39t/jPUcIppU3be10cPib/q2XRaHR+T+JL0quc/kcN22W4PvMp4u1KEG/iu0cyjUc6bzALZDVOkU0yQRa7DgON/pOhCGeysYKcM0tDs6GxukoitSa1QlhY+g4DFbHlax6w5zNjUpVW4new3FFSfLqK8fugbiK5pMErKabG5UGxDAbypG8CYr9zt0qlOtrSkn9n9BDGU/XXxHzhmXct5U+wjjKfrr4iGZBy59iPnqn0czdyn47osyHymt9PmLpKh3IFHNjc+AhdsLQXW/oLzS/psW7Ny+AhluHMt8KHqYUaFOqRut8COIg0Cqfq1I+cldKi27Rqv9oXDl5vhf8mhHBFwQR2RkGmtyUBCjAUAFABQAoqYxF0LAnkNT4CJtImqUn0IUi1V6aEMlOo6oT+fW+7ly9sjrJ2Co1SpymtZJN26Hf4PDrTUIgAUCwHITQopaHiqlaVabnN6stpjeDa19LX3WG+/G941Yi7dBBCc2traKdd9t5B36yajqNpWHNEb+N76X3gW9sbRGxW9QZshOpGYaHcCOO7ee+RaQtL2GPdp39u/5yHWwJE7/d4riPnk1ghBGrXAUDibi3vtOeoOej26nRxj4pi1CjWp5VFpt97B7yrN6oGl8gv4t9+2Y8HpD5s2YxVKc6Ndxcoxbulr8zHs7FOqtSzWWoRm42txHu8BLqkb6roVYrFYric1HCQcEvzPQ6DBjCUx1VaoeJYW79+6ZKiqt6mzBcJnho2jZPrLdsXlHg0FJatO4R9QD+Ujh8ZKm2mUcVm5YOrCr8UdU/PoUeTzZqdVyuZ6NgFIuNdQ5HEW+clXha3mXYXETnRpQm7NpXfkT2Zt2jVLGtSyOjFekpi2ZQT6Q7u+dGhQxNJKeHl0MGNdOlVs7+QRx+Pp0QVpJc1NWJ0uP7/WXww2KqVo1cTstUv9jLWqxpu6W+pTs41cQ3R0kCDexH5RxPK87VTFWjorGaWJk1aKsd3gMN0aLTX0VFgeztnMk3J3KE7HE+V4arjaPRIH/wAMzvc5KgArAIaDEdSpcvv0YaGVV5qnTvJ21LYVHFZlozNhsfvDDpQvpEU7VkP+/RtcfuS6nkBKlUi/i07Po/n/ACd7C8Y/LV+oQwtWm4zUyrDmtjY8jbcewyxxsdiFZVFeLuaIiQrQAz43E9Gt8pY6HKNWy5lDsANWyqc1hvtJxjcrqTyq5bSqBgCL6gHUEGx3XB1ETVicZZlcnIjKHwiE3tY8xofdFZE1UkhvNzwqMO+x+IhYeddUhdHU/wBQHvX6GFmGaHb7i6Op64/p/vCzDNDt9xebtxqt7AB8o7Bnj+kbzJT6WZv3MT7osqHzZdNC6lRVfRUDuEdkiuUm92Dqu1R09FUXpFSvRFZgQBTL1VpooNus+Zw2Ubgutri84xWZJvXojmYziEaSdOOraa9LnqfQy9QPOKIhTjUAykThhqeYsdTu18N8Sgr3JdLE0HDlv7/+pPKJIXRRZUwsU1aKnvB43PAk256XkeWh2J9AsMkSPLR4dW2nhVZagwxNQHq6gKGO47/lOBCjXay59D19Kc8Rh4Vm9JJPzVzDtOsXqFidbC/fLqUMkbI6lKOWNiikLaybvscjHY3Ec5YbCJOdrtvZIKYatYKWUhTrcDfrqRe0zz30OdV4/VwsnTxVLxf6dUwhj9oecdHRpoVppuG8k8zb73ytLLqzkKviOJycFHLGTvJvsVVqtXDOKqAqQLVFI9JL8uNtT4yVPLPwPr+56udCnKCtql27GvZvlAKiqa9FDc3JUa2vvseztnQhw2UY5qU2n2PN168FNpq4WqeTb1q91cdEyq2c8FO4AcT9ZrwuNlVuqm6MmJXizdDs9m7Mo0aaoq66ZjrctazG51l0nmepSlGxsZF4SNkDUTjtrqF2p+/Bi38mIN7f1ic/ii/oJ+ZKXwjY/ZdKtYunWX0XUlai/tdbMPGcKlXqU/henboVptArF7Cq3zKy1TwLk0q3d09IdYfuUzoUcdFNXTXpt9GW060oO8XYGja1SmSrluqSv4qFluOVfDgi3ayCduGHrTpqrGF4vqv4/wA8jrUeI4hK7V0bsFtoVB1aTP20Wp1h4Kwce1RKJyjB2np6qxtjxaltJNFW0MdRcLmqVKDo2ZWem9MqbEH/ADEysCCQQdPCWRkl1X1LHjMNVXxWNmzOj1K1hVZrFmzISQBZQAmgA5DmTxhJPtY1UpQ3zXubyp5SsuumNAY2aMdhCAh2036d+kLMi5RXUwVdtUAcvSozD8qHpG/pS590eVrconi6MPikirF7XKj/AC+jB3NiHSgvg5zn2LI54Xsnf0MVTi9KK8KbM1N6lbcKtYerTVsPh+zNWqfiVB+wW7JnqYjKr3Ufuzl1+JVanWy8jXhMC9PGbPFRk6PpmCYekuWihGHqur3PWdgQNTpre0fD60Kk5NJ3tu9/9jFGV22enDFaXsZ0OYPOIVh6v3rujVRApoXTbt/ba3hHzEPmIT1QdDe2h0Ntxv4ROogzoRxHZaLmCzopw9YgWNzvt3cNb6mLmBnRd5x2fCHMDOeL4h6VE/h01qOdSzDqraw0Hznn4qdT4nZdkevxGJpYalFVHlW0Yrd2HrIuIpO2RVq0+t1dzDj990UW6U0r3i+/Qjg+IwqzyxuvKSswVs3DM7ABOkt1iovqARcaa8eHOaqksquY+M0sRhq3vuHSbtlaCmM2o1V+t1EXREHoqPrKYxSXmZ8BxjDXyYiDjJ9ZLRhnAXp0MRVS3SInUJ1todR98JVG0panXxNnOnTXwt9Cqt01fZq3DVKxbIpAJZlJKkm3YN/ZNMKcXXSRlxM44atJR2sF/JjyFQKKmKIqGwy0wfw1tvzZdGPZ43nburas4End6K37nWYSmqnKuihbDuGg3bt051Kzrya21J1I3ikzcbTbmVrmblorQgjMuoIuOWvHu+kWcTp2ZyXlmMmKwNfWxarh27OmTMl/56QHtlWKjzMPJdtRSj4WaZ5UoGvGtwOMwrXUHiese9jc+8z7LhIKFCEY7JL9jt0VaCK8TgqVT06aMRxIFx3HeJZOlCatJJk3FS3HpUHQWp4jEIOQqs4/pq5hOdV4Lg6vxQ+mhTLDU30K8Rh6jjrtQqnnWwtFye8oEMy//nqEfglJfMr90XRlS4Zx/Cof+t8XQ9yVSBM0uAVU7wrP5q41Rqrab+4ujqj+ET3Y/Gr8bx/gmI/8i/8Akko11tMvoUqtRxT6Mi4Nicfi+AvbRQT/AGmLH4KtgqLrSkml2iiutVrwV3I3r5OVePRfz18dV9xqCeefEVL8z+SSMjxNR7yf1JU/JVr3Y4QHmuEzN/VXqP8ACKXEYr4cz9WQlVb3bfzCFHYVhZ8TiGHqqyUF7v8ADoht2XmZ455s0Yq/zf73I5zZhNlUKRvToorHe2UFz2lzdj7TKJ4qrJZW9CN2bCZQIxJTz4/CL/priK57LItFb+2sf6Z2uEqynL0RZT6nX2v9/CdO4Zbjg2sNLmFxqDJWPC3xhcdhgDf5wuKzGy6WOvDXSK5JRJZDw4+6A8o9uyMMp4ZiTcXG4n4TlRVpWPRqKrcbalrkgrer/wCQh5NLZqhPohNeWuvwlOLd0ku50MZFPEQa3s/oZdhYs0ayva4GjDiVIsfbuPsmirHNFo24mmqtNwZ0O09iZwatEdIrXYBbBrnfa5A3zJGbuos4GKVGvRdDErVbPqS8m8O9TD4qmQ1woQhULsubMp6oOpHLslsKblO8Ve25xuGY2o1yZPWm9G/5OrwXklTTDrQZmrL6RFTqnU3tZbWF76TpTwklJVKe5oqYlzm5SCOD2cEORAtNQqjIp6qrrayDRb67hrE6NepJ5na5W5xyhJMKoGW1wd/34zXTw8IRskVObbuWUcOFULwFwOwcALct0tjFRViMnd3Y9GkFVVF7KABc3JsLak7z2x2Io57y+2b0+ArZR+JTAr0rjUVKJ6RR7iPbBRT07j8gXg8SKtNKq+jUVXHcwDD4zxtam6c3FmRqzsXSsRz42A+YgVFFO5IsCXsTfKL6C26+s9lT9q1TwsYKF5pWv09TZHFuMMthbawFKnTXIgD51Ab8x9bM289UHfK+B8SxeKx6U5NqzbXQjQqSlUV2D5786woAPSoVHLCmoOQAkE2JvewXhfQ75zeIcUoYFw5v5n9PMz1q6puzIU3v2EaEHQg8iOBm+nUjUipwd09mWwmpq6NeyVvXS35AzHsuMov33904HtPWjDAuL3k0jLjX4bHTT5mcwUAFAB4ANABeSdM1MRiq/wCVTTwqf+u9Ssw59eqE76R9npcDTyYeN93qXQWh07gXA4nja9rW3+M02J2F0Y7LiKwElXt+UdgE9O9uwg890aQEWTW9xY6EHv0itYepKx5/3hYBsnaYhHiuNw4Vyg3KSBOPRk5eJ9bHc4bJz4rXm97IJ1KYTDdX+IeseOoP0meLc62vQ7LlmrpsC+T2H85xQoMzIl7Ho7Kx9pBnZhTimjFi8XUUXZnsGyPJ/D4UBKVOwJuSSzMTY6m536TYsPSlutjz8q85y1YD8j6SlsWxUE+cLa99PxGAItx1mTCRSzrzOZw9tTqST3Z3M6JtIUwNGsLkC5trbfa/LUwGO5tr96kQEMovr28L8LiDGSZbgjmLeMBFdKgoXIAMostuy1vnG2NaHnXkomXCqg3U3rU1v6tPEVUUf0qJ5biatiZGWe7C055EUAOf8oXPTIvAIzDvLAfAe8z2/shTjerProv7mzBK8mzBPbnUFADf5Pn8ZxwNME96vYf/AKM8h7YRXIpy65v7HPxy2YVxezKVU3ZetuzKSrW5EqdR3zyGE4pisJ/2Z2XbdfRmKFSUPhZZgsElIEItr7ySSSeZJ1MrxWOr4uWetK7+y9EKU5Sd2y+YyIoAKADwArxD5VZhvVSRfmATJ01eST7gbvIWnbZ2EPF6KVXPrPVHS1GPezsfbPW1NJWXQvYcoPcd8ihoVQ2Ps+do3oKTGLERXYkyuo5FrHjISk0A2cwuHQrwdQkH95ii7k5vRehT523OVcxlWZn/2Q=="/>
+      <img src="https://learn.g2.com/hs-fs/hubfs/plan%20gif%20marketing%20strategy.gif?width=500&name=plan%20gif%20marketing%20strategy.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" alt="Evil Patrick" />
+      <span>Evil Patrick</span>
+    </div>
+    <div class="gifOption selected" tabindex="0" data-name="Evil Elmo" data-src="https://castillejacounterpoint.com/wp-content/uploads/2022/04/SVgTSjtHjAglhyvmDTksZtRTIlGTIhMOFq9WyiO5.gif"/>
+      <img src="https://castillejacounterpoint.com/wp-content/uploads/2022/04/SVgTSjtHjAglhyvmDTksZtRTIlGTIhMOFq9WyiO5.gif"<span>Evil Elmo</span>
+    </div>
+    <div class="gifOption selected" tabindex="0" data-name="Cute Dog" data-src="https://i0.wp.com/cdn.onwardstate.com/uploads/2015/05/oie_14175751vZSQRLEn.gif?fit=650%2C408&ssl=1"/>
+      <img src="https://i0.wp.com/cdn.onwardstate.com/uploads/2015/05/oie_14175751vZSQRLEn.gif?fit=650%2C408&ssl=1"<span>Cute Dog</span>
+    </div>
+    <div class="gifOption selected" tabindex="0" data-name="Ray Ray" data-src="https://brightspotcdn.byu.edu/dims4/default/f4c7a6d/2147483647/strip/true/crop/355x325+0+0/resize/355x325!/quality/90/?url=https%3A%2F%2Fbrigham-young-brightspot-us-east-2.s3.us-east-2.amazonaws.com%2F88%2F2e%2F8bd62b724e9f906e2e8569170b04%2Fshaq-gif.gif"/>
+      <img src="https://brightspotcdn.byu.edu/dims4/default/f4c7a6d/2147483647/strip/true/crop/355x325+0+0/resize/355x325!/quality/90/?url=https%3A%2F%2Fbrigham-young-brightspot-us-east-2.s3.us-east-2.amazonaws.com%2F88%2F2e%2F8bd62b724e9f906e2e8569170b04%2Fshaq-gif.gif"<span>Ray Ray</span>
+    </div>
+    <div class="gifOption selected" tabindex="0" data-name="Dancing Baby" data-src="https://community.atlassian.com/forums/image/serverpage/image-id/92125i3C77265C1D4DC6E3/image-size/large?v=v2&px=999"/>
+      <img src="https://community.atlassian.com/forums/image/serverpage/image-id/92125i3C77265C1D4DC6E3/image-size/large?v=v2&px=999"<span>Dancing Baby</span>
+    </div>
+    <div class="gifOption selected" tabindex="0" data-name="The Changing" data-src="https://colinbendell.cloudinary.com/image/upload/c_crop,f_auto,g_auto,h_350,w_400/v1512090971/Wizard-Clap-by-Markus-Magnusson.gif"/>
+      <img src="https://colinbendell.cloudinary.com/image/upload/c_crop,f_auto,g_auto,h_350,w_400/v1512090971/Wizard-Clap-by-Markus-Magnusson.gif"<span>The Changing</span>
+    </div>
+    <h1>Among us</h1>
+    </div>
+    <div class="gifOption selected" tabindex="0" data-name="Among Us 10 ways to Kill" data-src="https://www.gifcen.com/wp-content/uploads/2022/02/among-us-gif.gif"/>
+      <img src="https://www.gifcen.com/wp-content/uploads/2022/02/among-us-gif.gif"<span>Among Us 10 ways to Kill</span>
+    </div>
+    <div class="gifOption selected" tabindex="0" data-name="Let ME INNNNNNNN" data-src="https://nerdramblesblog.wordpress.com/wp-content/uploads/2020/10/giphy-1-1.gif?w=480"/>
+      <img src="https://nerdramblesblog.wordpress.com/wp-content/uploads/2020/10/giphy-1-1.gif?w=480"<span>Let Me INNNNNNNN</span>
+    </div>
+    <div class="gifOption selected" tabindex="0" data-name="Dancing Among Us" data-src="https://gifsec.com/wp-content/uploads/2022/09/among-us-gif-3.gif"/>
+      <img src="https://gifsec.com/wp-content/uploads/2022/09/among-us-gif-3.gif"<span>Dancing Among Us</span>
+    </div>
+    <div class="gifOption selected" tabindex="0" data-name="Thanos" data-src="https://gifsec.com/wp-content/uploads/2022/09/among-us-gif-25.gif"/>
+      <img src="https://gifsec.com/wp-content/uploads/2022/09/among-us-gif-25.gif"<span>Thanos</span>
+    </div>
+    <div class="gifOption selected" tabindex="0" data-name="HAHHAHHAHAHAHAA" data-src="https://www.gifcen.com/wp-content/uploads/2022/03/among-us-gif-3.gif"/>
+      <img src="https://www.gifcen.com/wp-content/uploads/2022/03/among-us-gif-3.gif"<span>HAHHAHHAHAHAHAA</span>
+    </div>
+  </aside>
+
+  <aside id="menuRightUtilities" class="hidden">
+    <div class="sidebar-header">Games Library</div>
+    <div id="launcherWrapper"></div> <!-- This is where lists go -->
+  </aside>
+
+  <main id="viewer">
+    <img id="mainGif" src="https://www.thisiscolossal.com/wp-content/uploads/2018/08/Isopoly_05.gif" alt="spring">
+  </main>
+
+<script>
+  // --- CONFIGURATION: ADD MORE LISTS AND GAMES HERE ---
+  const gameCategories = [
+    {
+      title: "games",
+      games: [
+        {name: "Minecraft 1.12", url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/single-file.html" },
+        {name: "Parking Fury", url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/parkingfury3.html" },
+        {name: "Wheely Bike", url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/wheeliebike.html"},
+        {name: "Space Waves", url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/spacewaves.html"},
+        {name: "Ragdoll Archer", url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/ragdollarchers.htm"},
+        {name: "Wordle Unlimited", url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/wordleunlimited.html"},
+        {name: "Geometry Dash", url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/geometrydash.html"},
+        {name: "Karate Bros", url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/karatebros.html"},
+        {name: "Ping-Pong Chaos", url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/pingpongchaos.html" },
+        {name: "Basketball Random", url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/basketrandom.html"},
+        {name: "Elastic Face", url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/offline/elasticface.htm"}
+      ]
+    },
+    {
+      title: "Utilities",
+      games: [
+        { name: "Single File", url: "https://raw.githubusercontent.com/CoolDude2349/Offline-HTML-Games-Pack/refs/heads/master/single-file.html" },
+        { name: "soundboard", url: "https://raw.githubusercontent.com/surnamemans/Sound-Board/refs/heads/main/my%20instants%20sound%20board" }
+        ]
+    }
+  ];
+
+  // Sidebar Toggles
+  const menuLeft = document.getElementById('menuLeft');
+  const menuRight = document.getElementById('menuRightUtilities');
+  
+  document.getElementById('toggleLeft').onclick = () => menuLeft.classList.toggle('hidden');
+  document.getElementById('toggleRightUtilities').onclick = () => menuRight.classList.toggle('hidden');
+
+  // GIF Logic
+  const mainGif = document.getElementById('mainGif');
+  const gifOptions = document.querySelectorAll('.gifOption');
+
+  gifOptions.forEach(opt => {
+    opt.onclick = () => {
+      mainGif.src = opt.dataset.src;
+      gifOptions.forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+    };
+  });
+
+  // GAME LAUNCHER LOGIC
+  function openGameInNewTab(url) {
+    fetch(url)
+      .then(res => {
+        if (!res.ok) throw new Error(`HTTP error: ${res.status}`);
+        return res.text();
+      })
+      .then(html => {
+        const baseUrl = url.substring(0, url.lastIndexOf("/") + 1);
+        // Add base URL so images/scripts inside the game work
+        html = html.replace(/<head(\s|>)/i, `<head><base href="${baseUrl}">`);
+
+        const newWin = window.open('about:blank', '_blank');
+        if (!newWin) {
+          alert("Pop-up blocked! Please allow pop-ups to launch the game.");
+          return;
+        }
+        newWin.document.open();
+        newWin.document.write(html);
+        newWin.document.close();
+      })
+      .catch(err => {
+        alert("Failed to load game.");
+        console.error(err);
+      });
+  }
+
+  // BUILD THE LISTS
+  const wrapper = document.getElementById('launcherWrapper');
+
+  gameCategories.forEach(cat => {
+    // Create category title
+    const catHeader = document.createElement('div');
+    catHeader.classList.add('category-title');
+    catHeader.textContent = cat.title;
+    wrapper.appendChild(catHeader);
+
+    // Create buttons for this category
+    cat.games.forEach(game => {
+      const btn = document.createElement('button');
+      btn.classList.add('gameBtn');
+      btn.textContent = game.name;
+      btn.onclick = () => {
+        openGameInNewTab(game.url);
+        // Clear gif highlights when playing
+        gifOptions.forEach(o => o.classList.remove('selected'));
+      };
+      wrapper.appendChild(btn);
+    });
+  });
+</script>
+</body>
+</html>
+
